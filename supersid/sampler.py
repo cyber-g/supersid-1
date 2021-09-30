@@ -269,6 +269,8 @@ class Sampler():
                     controller.config['Device'],
                     controller.config['PeriodSize'],
                     audio_sampling_rate)
+            elif controller.config['Audio'] == 'adalm1k':
+                self.capture_device = adalm1k_adccard(audio_sampling_rate)
             else:
                 self.display_error_message(
                     "Unknown audio module:" + controller.config['Audio'])
