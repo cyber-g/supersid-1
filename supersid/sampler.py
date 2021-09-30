@@ -25,6 +25,7 @@ This 'device' can be a local sound card:
 from __future__ import print_function   # use the new Python 3 'print' function
 from struct import unpack as st_unpack
 from numpy import array
+import numpy
 
 from config import DEVICE_DEFAULT  # get value from config.py
 
@@ -188,6 +189,61 @@ try:
 except ImportError:
     pass
 
+try:
+    import pysmu    # driver library for ADALM1000 (and others)
+    audioModule.append("adalm1k")
+    # Requires libsmu which provides pysmu
+    # https://github.com/analogdevicesinc/libsmu
+
+    class adalm1k_adccard():
+        """
+        A class for the ADALM1000 ADC board
+        """
+        def __init__(self, audio_sampling_rate):
+            self.audio_sampling_rate = audio_sampling_rate
+
+            self.a1k_session = pysmu.Session(sample_rate=audio_sampling_rate)
+            if self.a1k_session.devices:
+                # Grab the first device from the session.
+                self.dev = self.a1k_session.devices[0]
+
+                # Set both channels to high impedance mode.
+                self.chan_a = self.dev.channels['A']
+                self.chan_b = self.dev.channels['B']
+                self.chan_a.mode = pysmu.Mode.HI_Z
+                self.chan_b.mode = pysmu.Mode.HI_Z
+
+                self.name = "adalm1k ADC card capture"
+
+        def capture_1sec(self):
+            # duration = 1 sec 
+            # hence :
+            # 1 x self.audio_sampling_rate = self.audio_sampling_rate
+            samples = self.dev.get_samples(self.audio_sampling_rate)
+            # returns a list : (N_samples,(2,2))
+
+            # from libsmu : plot-voltage.py we know that chan_A voltage 
+            # is in "samples[:][0][0]"
+            samples_mat = numpy.array(samples)
+            return samples_mat[:, 0, 0]
+
+        def close(self):
+            self.a1k_session._close()
+
+        def info(self):
+            # Inspired from libsmu : hotplug.py
+            self.a1k_session.scan()
+            self.available_devices = self.a1k_session.available_devices
+            nmbr_avail_dev = len(self.available_devices)
+            print("Number of available devices: " + str(nmbr_avail_dev))
+            # Inspired from libsmu : pysmu.py
+            for i, dev in enumerate(self.a1k_session.devices):
+                print('device {}: {}'.format(i, dev))
+
+
+except ImportError:
+    pass
+
 
 class Sampler():
     """Sampler will gather sound capture from various devices."""
@@ -302,6 +358,15 @@ if __name__ == '__main__':
 
     if 'pyaudio' in audioModule:
         sc = pyaudio_soundcard(48000)
+        sc.info()
+    else:
+        print("not installed.")
+
+    print("\n", "- "*60)
+    print("adalm1k:")
+
+    if 'adalm1k'in audioModule:
+        sc = adalm1k_adccard(48000)
         sc.info()
     else:
         print("not installed.")
