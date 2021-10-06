@@ -270,8 +270,8 @@ class SUPERSID_PLOT():
         if pdf or eMail:
             # in case option eMail is given
             # but not pdfpp = PdfPages(pdf or 'Image.pdf')
-            plt.savefig(pp, format='pdf')
-            pp.close()
+            plt.savefig(pdf, format='pdf')
+            plt.close()
         if showPlot:
             plt.show()
         if eMail:
