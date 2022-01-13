@@ -157,7 +157,7 @@ class SUPERSID_PLOT():
         colorStation = {}
         colorIdx = 0
 
-        time.clock()
+        time.perf_counter()
         for filename in sorted(filenames):
             figTitle.append(os.path.basename(filename)[:-4]) # extension .csv assumed
             sFile = SidFile(filename)
@@ -230,7 +230,7 @@ class SUPERSID_PLOT():
                 # keep track of the days
                 daysList.add(sFile.startTime)
 
-        print ("All files read in", time.clock(), "sec.")
+        print ("All files read in", time.perf_counter(), "sec.")
 
         if web:  # add the lines marking the retrieved flares from NOAA
             alternate = 0
