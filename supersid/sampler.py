@@ -299,11 +299,12 @@ class Sampler():
         """
         try:
             self.data = self.capture_device.capture_1sec()
-        except:
+        except Exception as e:
             self.sampler_ok = False
-            print ("Fail to read data from audio using "
+            print("Fail to read data from audio using "
                    + self.capture_device.name)
             self.data = []
+            print("Exception message: "+e)
         else:
             # Scale A/D raw_data to voltage here
             # Might substract 5v to make the data look more like SID
