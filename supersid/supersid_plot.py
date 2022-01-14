@@ -186,6 +186,7 @@ class SUPERSID_PLOT():
                     #ftp://ftp.swpc.noaa.gov/pub/indices/events/20141030events.txt
                     NOAA_URL = 'ftp://ftp.swpc.noaa.gov/pub/indices/events/%sevents.txt' % (day)
                     response = None
+                    print("Requesting "+day+"events.txt @ftp.swpc.noaa.gov")
                     if sys.version[0]<'3':  # python 2.7 vs. Python 3.3
                         try:
                             response = urllib2.urlopen(NOAA_URL)
